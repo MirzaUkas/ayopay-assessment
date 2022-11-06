@@ -1,3 +1,3 @@
 class APIEndpoint {
-  static String get newsapi => "https://newsapi.org/v2";
+  static String get demoapi => "https://my-json-server.typicode.com/MirzaUkas/demo";
 }

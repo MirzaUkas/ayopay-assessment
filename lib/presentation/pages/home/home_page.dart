@@ -40,7 +40,7 @@ class HomePage extends StatelessWidget {
               ),
             );
           },
-          child: const Text("TOP UP"),
+          child: const Text("MENU"),
         ),
       ),
     );
@@ -98,7 +98,9 @@ class HomePage extends StatelessWidget {
                 ),
               ),
               InkWell(
-                onTap: () => Get.to(() => TransactionHistoryPage()),
+                onTap: () {
+                  Get.toNamed("transaction-history");
+                },
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -114,7 +116,7 @@ class HomePage extends StatelessWidget {
                 ),
               ),
               InkWell(
-                onTap: () => Get.to(() => TopUpMethodPage()),
+                onTap: () => Get.toNamed('payment'),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [

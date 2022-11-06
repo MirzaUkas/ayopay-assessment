@@ -11,14 +11,28 @@ class TransactionHistoryEntity {
 }
 
 class TransactionEntity {
+  int id;
   String name;
-  PaymentMethodEntity paymentMethod;
   double amount;
+  double fee;
+  double total;
+  bool status;
+  String date;
+  String time;
+  String referenceCode;
+  PaymentMethodEntity paymentMethod;
 
   TransactionEntity({
+    required this.id,
     required this.name,
-    required this.paymentMethod,
     required this.amount,
+    required this.fee,
+    required this.total,
+    required this.status,
+    required this.date,
+    required this.time,
+    required this.referenceCode,
+    required this.paymentMethod
   });
 }
 

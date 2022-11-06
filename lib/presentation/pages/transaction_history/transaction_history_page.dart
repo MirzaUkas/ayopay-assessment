@@ -1,4 +1,5 @@
 import 'package:ayopay_assessment/app/extensions/number.dart';
+import 'package:ayopay_assessment/presentation/pages/transaction_history/transaction_history_controller.dart';
 import 'package:ayopay_assessment/presentation/pages/transaction_detail/transaction_detail_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -7,47 +8,11 @@ import 'package:get/get.dart';
 import '../../../app/config/color.dart';
 import '../../../app/config/dimens.dart';
 import '../../../app/config/typography.dart';
-import '../../../domain/entities/payment_method_entity.dart';
 import '../../../domain/entities/transaction_entity.dart';
+import '../../../widgets/loading_dialog.dart';
 
-class TransactionHistoryPage extends StatefulWidget {
+class TransactionHistoryPage extends GetView<TransactionHistoryController> {
   const TransactionHistoryPage({Key? key}) : super(key: key);
-
-  @override
-  State<TransactionHistoryPage> createState() => _TransactionHistoryPageState();
-}
-
-class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
-  final _transactions = [
-    TransactionHistoryEntity(date: "Selasa, 01 Nov 2022", transactions: [
-      TransactionEntity(
-        name: "Top Up Saldo",
-        paymentMethod: PaymentMethodEntity(
-            provider: "Mandiri",
-            icon: "assets/icons/ic_mandiri.png",
-            steps: []),
-        amount: 10000,
-      ),
-      TransactionEntity(
-        name: "Top Up Saldo",
-        paymentMethod: PaymentMethodEntity(
-            provider: "Mandiri",
-            icon: "assets/icons/ic_mandiri.png",
-            steps: []),
-        amount: 10000,
-      ),
-    ]),
-    TransactionHistoryEntity(date: "Selasa, 05 Oct 2022", transactions: [
-      TransactionEntity(
-        name: "Top Up Saldo",
-        paymentMethod: PaymentMethodEntity(
-            provider: "Mandiri",
-            icon: "assets/icons/ic_mandiri.png",
-            steps: []),
-        amount: 10000,
-      ),
-    ]),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +25,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
             width: 24,
             height: 24,
           ),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => Get.back(),
         ),
         title: Text(
           "Riwayat Transaksi",
@@ -76,11 +41,19 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
           horizontal: AppDimens.s20,
           vertical: AppDimens.s30,
         ),
-        child: ListView.builder(
-          itemCount: _transactions.length,
-          itemBuilder: (context, position) =>
-              _transactionItem(_transactions[position]),
-        ),
+        child: controller.obx(
+            (state) => ListView.builder(
+                  itemCount: state?.length,
+                  itemBuilder: (context, position) =>
+                      _transactionItem(state![position]),
+                ),
+            onError: (error) => Center(
+                  child: Text(
+                    error.toString(),
+                    style: AppTypography.caption2,
+                  ),
+                ),
+            onLoading: const LoadingDialog()),
       ),
     );
   }
@@ -99,7 +72,8 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
         ListView.separated(
             shrinkWrap: true,
             itemBuilder: (context, pos) => InkWell(
-                  onTap: () => Get.to(() => TransactionDetailPage()),
+                  onTap: () => Get.toNamed("transaction-detail",
+                      arguments: {'id': transaction.transactions[pos].id}),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -125,7 +99,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                                   transaction.transactions[pos].amount
                                       .toRupiah(),
                                   style: AppTypography.body5
-                                      .copyWith(color: AppColor.colorSuccess),
+                                      .copyWith(color: transaction.transactions[pos].status ? AppColor.colorSuccess : AppColor.colorDanger),
                                 ),
                               ],
                             ),

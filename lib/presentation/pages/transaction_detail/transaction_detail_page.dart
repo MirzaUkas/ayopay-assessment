@@ -1,19 +1,19 @@
+import 'package:ayopay_assessment/app/extensions/number.dart';
+import 'package:ayopay_assessment/domain/entities/transaction_entity.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 
 import '../../../app/config/color.dart';
 import '../../../app/config/dimens.dart';
 import '../../../app/config/typography.dart';
+import '../../../widgets/loading_dialog.dart';
+import 'transaction_detail_controller.dart';
 
-class TransactionDetailPage extends StatefulWidget {
+class TransactionDetailPage extends GetView<TransactionDetailController> {
   const TransactionDetailPage({Key? key}) : super(key: key);
 
-  @override
-  State<TransactionDetailPage> createState() => _TransactionDetailPageState();
-}
-
-class _TransactionDetailPageState extends State<TransactionDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,7 +25,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
             width: 24,
             height: 24,
           ),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => Get.back(),
         ),
         title: Text(
           "Rincian Transaksi",
@@ -36,26 +36,37 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
         ),
         centerTitle: true,
       ),
-      body: ListView(
-        children: [
-          ..._successTransaction(),
-          // ..._failedTransaction(),
-          Container(
-            margin: EdgeInsets.symmetric(
-                horizontal: AppDimens.s48, vertical: AppDimens.s48),
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(),
-              style: ElevatedButton.styleFrom(shape: const StadiumBorder()),
-              child: const Text("Tutup"),
-            ),
-          )
-        ],
+      body: controller.obx(
+        (state) => ListView(
+          children: [
+            if (state!.status)
+              ..._successTransaction(state)
+            else
+              ..._failedTransaction(state),
+            Container(
+              margin: EdgeInsets.symmetric(
+                  horizontal: AppDimens.s48, vertical: AppDimens.s48),
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Get.back(),
+                style: ElevatedButton.styleFrom(shape: const StadiumBorder()),
+                child: const Text("Tutup"),
+              ),
+            )
+          ],
+        ),
+        onError: (error) => Center(
+          child: Text(
+            error.toString(),
+            style: AppTypography.caption2,
+          ),
+        ),
+        onLoading: const LoadingDialog(),
       ),
     );
   }
 
-  List<Widget> _successTransaction() {
+  List<Widget> _successTransaction(TransactionEntity transaction) {
     return [
       SizedBox(
         height: AppDimens.s30,
@@ -72,7 +83,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
         style: AppTypography.body4.copyWith(color: AppColor.colorSuccess),
       ),
       Text(
-        "Rp10.000",
+        transaction.amount.toRupiah(),
         textAlign: TextAlign.center,
         style: AppTypography.title1,
       ),
@@ -92,7 +103,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
             width: AppDimens.s8,
           ),
           Text(
-            "Top Up Saldo",
+            transaction.name,
             style: AppTypography.body4,
           )
         ],
@@ -123,14 +134,14 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
           children: [
             Row(
               children: [
-                Image.asset(
-                  "assets/icons/ic_one_klik.png",
+                Image.network(
+                  transaction.paymentMethod.icon,
                   width: 70,
                   height: 31,
                 ),
                 const Spacer(),
                 Text(
-                  "BCA One Klik",
+                  transaction.paymentMethod.provider,
                   style: AppTypography.body5
                       .copyWith(color: AppColor.colorBlack49),
                 ),
@@ -157,7 +168,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                       .copyWith(color: AppColor.colorGrey8C),
                 ),
                 Text(
-                  "Rp20.000",
+                  transaction.amount.toRupiah(),
                   style: AppTypography.caption7
                       .copyWith(color: AppColor.colorBlack49),
                 ),
@@ -175,7 +186,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                       .copyWith(color: AppColor.colorGrey8C),
                 ),
                 Text(
-                  "01 Nov 2022",
+                  transaction.date,
                   style: AppTypography.caption7
                       .copyWith(color: AppColor.colorBlack49),
                 ),
@@ -193,7 +204,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                       .copyWith(color: AppColor.colorGrey8C),
                 ),
                 Text(
-                  "13.13",
+                  transaction.time,
                   style: AppTypography.caption7
                       .copyWith(color: AppColor.colorBlack49),
                 ),
@@ -214,7 +225,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     Text(
-                      "ABC23123123",
+                      transaction.referenceCode,
                       style: AppTypography.caption7
                           .copyWith(color: AppColor.colorBlack49),
                     ),
@@ -235,7 +246,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                       .copyWith(color: AppColor.colorGrey8C),
                 ),
                 Text(
-                  "Rp10.000",
+                  transaction.amount.toRupiah(),
                   style: AppTypography.caption7
                       .copyWith(color: AppColor.colorBlack49),
                 ),
@@ -253,7 +264,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                       .copyWith(color: AppColor.colorGrey8C),
                 ),
                 Text(
-                  "Rp1.000",
+                  transaction.fee.toRupiah(),
                   style: AppTypography.caption7
                       .copyWith(color: AppColor.colorBlack49),
                 ),
@@ -276,7 +287,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
                         .copyWith(color: AppColor.colorBlack49),
                   ),
                   Text(
-                    "Rp11.000",
+                    transaction.total.toRupiah(),
                     style: AppTypography.caption2
                         .copyWith(color: AppColor.colorBlack49),
                   ),
@@ -296,7 +307,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
     ];
   }
 
-  List<Widget> _failedTransaction() {
+  List<Widget> _failedTransaction(TransactionEntity transaction) {
     return [
       SizedBox(
         height: AppDimens.s56,
@@ -313,7 +324,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
         style: AppTypography.body4.copyWith(color: AppColor.colorDanger),
       ),
       Text(
-        "Rp10.000",
+        transaction.amount.toRupiah(),
         textAlign: TextAlign.center,
         style: AppTypography.title1,
       ),
@@ -330,7 +341,7 @@ class _TransactionDetailPageState extends State<TransactionDetailPage> {
             width: AppDimens.s8,
           ),
           Text(
-            "Top Up Saldo",
+            transaction.name,
             style: AppTypography.body4,
           )
         ],

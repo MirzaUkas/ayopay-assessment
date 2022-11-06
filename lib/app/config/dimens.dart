@@ -9,6 +9,8 @@ class AppDimens {
 
   static double get s10 => 10 * scale;
 
+  static double get s11 => 11 * scale;
+
   static double get s12 => 12 * scale;
 
   static double get s14 => 14 * scale;
