@@ -21,8 +21,10 @@ class TopUpMethodDetailController extends GetxController
 
   @override
   void onReady() {
-    amount = Get.arguments['amount'];
-    controllerAmount = TextEditingController(text: amount.toRupiah());
+    if(Get.arguments['amount'] != null){
+      amount = Get.arguments['amount'];
+      controllerAmount = TextEditingController(text: amount.toRupiah());
+    }
     getPayment(Get.arguments['method']);
   }
 
